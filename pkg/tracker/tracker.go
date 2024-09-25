@@ -2,6 +2,7 @@ package tracker
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -9,6 +10,9 @@ import (
 	"strings"
 	"time"
 )
+
+var ErrEmptyTaskList = errors.New("tracker: Empty task list. Nothing to stop")
+var ErrFinishedTask = errors.New("tracker: Last task is already finished")
 
 type Task struct {
 	Name     string         `json:"name"`
