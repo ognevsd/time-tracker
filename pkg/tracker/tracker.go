@@ -84,19 +84,29 @@ func (t *Tasks) Add(name, project string) {
 	}
 
 	t.StopLastTask()
-
 	*t = append(*t, task)
 	t.save()
 }
 
-func (t *Tasks) StopLastTask() {
-	if len(*t) > 0 {
-		lastTask := &(*t)[len(*t)-1]
-		completionTime := time.Now()
-		taskDuration := completionTime.Sub((*t)[len(*t)-1].Started)
-		lastTask.Finished = &completionTime
-		lastTask.Duration = &taskDuration
+func (t *Tasks) StopLastTask() error {
+	if len(*t) == 0 {
+		return ErrEmptyTaskList
 	}
+
+	lastTask := &(*t)[len(*t)-1]
+
+	if lastTask.Finished != nil {
+		return ErrFinishedTask
+	}
+
+	completionTime := time.Now()
+	taskDuration := completionTime.Sub((*t)[len(*t)-1].Started)
+	lastTask.Finished = &completionTime
+	lastTask.Duration = &taskDuration
+
+	t.save()
+
+	return nil
 }
 
 func (t *Tasks) save() {
