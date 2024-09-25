@@ -26,8 +26,18 @@ type Tasks []Task
 
 var tasksPath string = path.Join(".", "test.json")
 
-func (t *Tasks) LoadTasks() {
-	fmt.Println("Tracker package is imported")
+func LoadTasks() (Tasks, error) {
+	tasks := Tasks{}
+	data, err := os.ReadFile(tasksPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return tasks, nil
+	} else if err != nil {
+		return tasks, err
+	}
+	if err := json.Unmarshal(data, &tasks); err != nil {
+		return tasks, err
+	}
+	return tasks, nil
 }
 
 func (t *Task) String() string {
