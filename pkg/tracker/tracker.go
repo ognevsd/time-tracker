@@ -6,12 +6,23 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/user"
 	"path"
 	"strings"
 	"time"
 )
 
 const timeFormat = "2006-01-02 15:04:05"
+
+func getFilePath() string {
+	user, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	homeDir := user.HomeDir
+	tasksPath := path.Join(homeDir, ".time-tracker.json")
+	return tasksPath
+}
 
 var ErrEmptyTaskList = errors.New("tracker: Empty task list. Nothing to stop")
 var ErrFinishedTask = errors.New("tracker: Last task is already finished")
@@ -26,11 +37,9 @@ type Task struct {
 
 type Tasks []Task
 
-var tasksPath string = path.Join(".", "test.json")
-
 func LoadTasks() (Tasks, error) {
 	tasks := Tasks{}
-	data, err := os.ReadFile(tasksPath)
+	data, err := os.ReadFile(getFilePath())
 	if errors.Is(err, os.ErrNotExist) {
 		return tasks, nil
 	} else if err != nil {
@@ -116,7 +125,7 @@ func (t *Tasks) save() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = os.WriteFile(tasksPath, res, 0644)
+	err = os.WriteFile(getFilePath(), res, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
