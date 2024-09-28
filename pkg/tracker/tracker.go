@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const timeFormat = "2006-01-02 15:04:05"
+
 var ErrEmptyTaskList = errors.New("tracker: Empty task list. Nothing to stop")
 var ErrFinishedTask = errors.New("tracker: Last task is already finished")
 
@@ -41,11 +43,11 @@ func LoadTasks() (Tasks, error) {
 }
 
 func (t *Task) String() string {
-	startFmt := t.Started.Format("2006-01-02 15:01:02")
+	startFmt := t.Started.Format(timeFormat)
 
 	var finishedFmt string
 	if t.Finished != nil {
-		finishedFmt = t.Finished.Format("2006-01-02 15:03:03")
+		finishedFmt = t.Finished.Format(timeFormat)
 	} else {
 		finishedFmt = "not finished"
 	}
