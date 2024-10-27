@@ -26,6 +26,7 @@ func getFilePath() string {
 
 var ErrEmptyTaskList = errors.New("tracker: Empty task list. Nothing to stop")
 var ErrFinishedTask = errors.New("tracker: Last task is already finished")
+var ErrNegativeDuration = errors.New("tracker: Duration shouldn't contain negative values")
 
 type Task struct {
 	Name     string         `json:"name"`
@@ -97,6 +98,30 @@ func (t *Tasks) Add(name, project string) {
 	t.StopLastTask()
 	*t = append(*t, task)
 	t.save()
+}
+
+func (t *Tasks) AddWithDuration(name, project, duration string) error {
+	if strings.Contains(duration, "-") {
+		return ErrNegativeDuration
+	}
+
+	parsedDuration, err := time.ParseDuration(duration)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	task := Task{
+		Name:     name,
+		Project:  project,
+		Started:  time.Now(),
+		Finished: nil,
+		Duration: &parsedDuration,
+	}
+
+	*t = append(*t, task)
+	t.save()
+
+	return nil
 }
 
 func (t *Tasks) StopLastTask() error {
